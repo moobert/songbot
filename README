@@ -1,0 +1,15 @@
+songbot
+=======
+
+An IRC bot in Twisted to display song changes made in Rhythmbox via D-Bus.
+Updates are limited to every 5 minutes, to cut down on spam.
+
+needs:
+python
+python-twisted
+python-dbus
+
+useage:
+./songbot.py irc.server.org 6667 channel nick
+
+then close with ctrl+c or by exiting Rhythmbox

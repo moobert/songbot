@@ -20,7 +20,7 @@ from twisted.internet import protocol
 
 import datetime
 import logging
-logger = logging.getLogger('songbot')
+log = logging.getLogger('songbot')
 
 class SongBot(irc.IRCClient):
     
@@ -29,11 +29,11 @@ class SongBot(irc.IRCClient):
         return self.factory.nickname
 
     def signedOn(self):
-        logger.info('Signed on')
+        log.info('Signed on')
         self.join(self.factory.channel)
 
     def joined(self, channel):
-        logger.info('Joined channel: %s' %  channel)
+        log.info('Joined channel: %s' %  channel)
         self.factory.client = self
 
 class SongBotFactory(protocol.ClientFactory):
@@ -45,11 +45,11 @@ class SongBotFactory(protocol.ClientFactory):
         self.nickname = nickname
 
     def clientConnectionLost(self, connector, reason):
-        exit()
+        shutdown()
 
     def clientConnectionFailed(self, connector, reason):
-        logger.error('Could not connect: %s' % str(reason))
-        exit()
+        log.error('Could not connect: %s' % str(reason))
+        shutdown()
 
     def sendSong(self, name):
         if self.client is not None:
@@ -79,11 +79,11 @@ class Rhythmbox:
                 song = '%s - %s' % (details['artist'], details['title'])
                 song = ' '.join(song.split())
             
-                logger.info('/me is now playing: %s' % song)
+                log.info('/me is now playing: %s' % song)
                 self.irc.sendSong('is now playing: 3%s' % song)
         except Exception, e:
-            logger.error('Could not access Rhythmbox closing')
-            exit()
+            log.error('Could not access Rhythmbox closing')
+            shutdown()
 
     def rateCheck(self):
         check = False
@@ -116,7 +116,7 @@ def initializeLogging(options):
 
     return logger
 
-def exit():
+def shutdown():
     reactor.callLater(1, reactor.stop)	
 
 def main():
@@ -127,16 +127,16 @@ def main():
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose')
 
     (options, args) = parser.parse_args()
-    if len(args) is not 4:
+    if len(args) != 4:
         parser.error("incorrect number of arguments")
 
     if not args[2].startswith('#'):
         args[2] = '#%s' % args[2]
 
-    logger = initializeLogging(options)
+    initializeLogging(options)
 
     irc = SongBotFactory(args[2], args[3])
-    player = Rhythmbox(irc)
+    Rhythmbox(irc)
     reactor.connectTCP(args[0], int(args[1]), irc)
 
     reactor.run()

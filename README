@@ -9,7 +9,7 @@ python
 python-twisted
 python-dbus
 
-useage:
+usage:
 ./songbot.py irc.server.org 6667 channel nick
 
 then close with ctrl+c or by exiting Rhythmbox
